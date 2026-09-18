@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --accent: #ec4899; --accent-soft: #fce7f3; --ink: #29252b; --surface: #ffffff; --line: #eee8ed; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #fffafd; color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+button, input, textarea { font: inherit; }
+.theme-dark { --accent: #ff4da6; --accent-soft: #27111e; --ink: #fff; --surface: #121212; --line: #302830; background: #080808; color: var(--ink); }
+.theme-blue { --accent: #0891b2; --accent-soft: #cffafe; --ink: #103047; --surface: #f5fcff; --line: #d9eff5; background: #effaff; color: var(--ink); }
+.theme-face { --accent: #a855f7; --accent-soft: #f3e8ff; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; }

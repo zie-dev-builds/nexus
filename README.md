@@ -1,27 +1,26 @@
-# nexus
-A full-stack social media application built with [React / Next.js / Node.js / Python] and [MongoDB / PostgreSQL], featuring real-time chat and media sharing.
-# nexus
+# NEXUS
 
-A full-stack social media application featuring real-time chat, interactive post feeds, and media sharing.
+A polished social media experience built with Next.js App Router, TypeScript, Tailwind CSS, Prisma, PostgreSQL, NextAuth, and Socket.IO.
 
-## Features
-- **User Authentication:** Secure login, sign-up, and profile management.
-- **Real-Time Feed:** Create, like, and comment on posts instantly.
-- **Messaging:** Direct real-time chat between users.
-- **Media Uploads:** Share images and media content seamlessly.
+## Included in this starter
+- Responsive feed with post composer, likes, comments-ready data model, and image posts
+- Theme Studio with Default Pink, Dark, Luminous Blue, and Personalized Face modes
+- NEXUS logo system: interlocking speech bubbles, negative-space N, and core star burst
+- People discovery and follow interaction
+- Direct message interface with local optimistic state
+- Prisma schema for users, posts, comments, likes, follows, and messages
 
-## Tech Stack
-* **Frontend:** React, Tailwind CSS
-* **Backend:** Node.js, Express
-* **Database:** MongoDB
-* **Real-time Engine:** Socket.io
+## Run locally
 
-## Getting Started
+```bash
+npm install
+cp .env.example .env
+# Set DATABASE_URL and NEXTAUTH_SECRET in .env
+npx prisma generate
+npx prisma db push
+npm run dev
+```
 
-### Prerequisites
-Make sure you have Node.js and Git installed on your local machine.
+Open http://localhost:3000.
 
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/zie-dev-builds/nexus.git](https://github.com/zie-dev-builds/nexus.git)
+The current UI uses seeded client-side demo data so the experience is immediately visible. Wire the Prisma models to Route Handlers/Server Actions and add a NextAuth provider for production authentication. Socket.IO can be attached to a custom Next server or a standalone realtime service.
