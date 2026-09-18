@@ -27,16 +27,16 @@ export async function GET() {
     },
   });
 
-  const mappedPosts = posts.map((post) => ({
-    ...post,
-    likedByMe: post.likes.some((like) => like.userId === user.id),
-    _count: {
-      likes: post.likes.length,
-      comments: post.comments.length,
-    },
-  }));
-
-  return NextResponse.json({ posts: mappedPosts });
+  return NextResponse.json({
+    posts: posts.map((post) => ({
+      ...post,
+      likedByMe: post.likes.some((like) => like.userId === user.id),
+      _count: {
+        likes: post.likes.length,
+        comments: post.comments.length,
+      },
+    })),
+  });
 }
 
 export async function POST(request: Request) {

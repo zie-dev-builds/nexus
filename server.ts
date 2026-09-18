@@ -25,6 +25,8 @@ async function main() {
 
   io.on("connection", (socket) => {
     const userId = socket.data.userId as string;
+
+    socket.emit("connected", { ok: true });
     socket.join(`user:${userId}`);
 
     socket.on("conversation:join", (conversationId: string) => {
@@ -46,8 +48,6 @@ async function main() {
 
       io.to(`user:${userId}`).to(`user:${receiverId}`).emit("message:new", message);
     });
-
-    socket.on("disconnect", () => undefined);
   });
 
   httpServer.listen(port, hostname, () => {
