@@ -37,3 +37,18 @@
     "typescript": "^5.6.2"
   }
 }
+"scripts": {
+  "dev": "tsx server.ts",
+  "build": "next build",
+  "start": "tsx server.ts",
+  "lint": "next lint",
+  "db:push": "prisma db push",
+  "db:seed": "tsx prisma/seed.ts",
+  "postinstall": "prisma generate"
+}
+"dependencies": {
+  "socket.io": "^4.8.1",
+  "socket.io-client": "^4.8.1"
+}
+npm install socket.io socket.io-client
+npm install -D tsx
