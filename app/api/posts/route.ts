@@ -18,44 +18,61 @@ export async function GET() {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  return NextResponse.json({
-    user: {
-      id: user.id,
-      name: user.name,
-      username: user.username,
-      email: user.email,
-      image: user.image,
-      bio: user.bio,
-      theme: user.theme,
+  const posts = await prisma.post.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      author: true,
+      comments: true,
+      likes: true,
     },
   });
+
+  const mappedPosts = posts.map((post) => ({
+    ...post,
+    likedByMe: post.likes.some((like) => like.userId === user.id),
+    _count: {
+      likes: post.likes.length,
+      comments: post.comments.length,
+    },
+  }));
+
+  return NextResponse.json({ posts: mappedPosts });
 }
 
-export async function PATCH(request: Request) {
+export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const currentUser = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email: String(session.user.email).toLowerCase() },
   });
 
-  if (!currentUser) {
+  if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   const payload = await request.json();
-  const updatedUser = await prisma.user.update({
-    where: { id: currentUser.id },
+  const body = String(payload.body ?? "").trim();
+
+  if (!body) {
+    return NextResponse.json({ error: "Post body is required." }, { status: 400 });
+  }
+
+  const post = await prisma.post.create({
     data: {
-      name: payload.name ? String(payload.name) : undefined,
-      bio: payload.bio ? String(payload.bio) : undefined,
-      theme: payload.theme ? String(payload.theme) : undefined,
-      image: payload.image ? String(payload.image) : undefined,
+      body,
+      imageUrl: payload.imageUrl ? String(payload.imageUrl) : null,
+      authorId: user.id,
+    },
+    include: {
+      author: true,
+      comments: true,
+      likes: true,
     },
   });
 
-  return NextResponse.json({ user: updatedUser });
+  return NextResponse.json({ post });
 }
