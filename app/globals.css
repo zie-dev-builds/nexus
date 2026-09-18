@@ -1,12 +1,143 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-:root { --accent: #ec4899; --accent-soft: #fce7f3; --ink: #29252b; --surface: #ffffff; --line: #eee8ed; }
-* { box-sizing: border-box; }
-body { margin: 0; background: #fffafd; color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
-button, input, textarea { font: inherit; }
-.theme-dark { --accent: #ff4da6; --accent-soft: #27111e; --ink: #fff; --surface: #121212; --line: #302830; background: #080808; color: var(--ink); }
-.theme-blue { --accent: #0891b2; --accent-soft: #cffafe; --ink: #103047; --surface: #f5fcff; --line: #d9eff5; background: #effaff; color: var(--ink); }
-.theme-face { --accent: #a855f7; --accent-soft: #f3e8ff; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; }
+export default async function SignupPage() {
+  const session = await getServerSession(authOptions);
+
+  if (session) {
+    redirect("/dashboard");
+  }
+
+  return (
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#f5f3ff,_#edf6ff_40%,_#fff1f2)] px-6 py-12 text-slate-800">
+      <div className="mx-auto max-w-4xl overflow-hidden rounded-[32px] border border-violet-100 bg-white/80 shadow-[0_30px_80px_rgba(168,85,247,0.12)] backdrop-blur-xl">
+        <div className="grid md:grid-cols-2">
+          <div className="bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 p-10 text-white">
+            <div className="mb-10 flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20">
+                <span className="text-xl font-black">N</span>
+              </div>
+              <div>
+                <div className="text-xl font-black tracking-[0.28em]">NEXUS</div>
+                <div className="text-[10px] tracking-[0.22em] text-white/70">BUILD YOUR CIRCLE</div>
+              </div>
+            </div>
+            <h1 className="text-4xl font-black leading-tight">Create a network that feels like your own.</h1>
+            <p className="mt-5 max-w-sm text-sm text-white/80">
+              Join NEXUS to share updates, meet new people, and keep the conversation flowing in real time.
+            </p>
+          </div>
+
+          <div className="p-8 md:p-12">
+            <div className="mb-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-600">New account</p>
+              <h2 className="mt-2 text-3xl font-black">Sign up for NEXUS</h2>
+            </div>
+
+            <SignupForm />
+
+            <div className="mt-6 text-center text-sm text-slate-500">
+              Already have an account? <a className="font-semibold text-violet-600" href="/login">Log in</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState, type FormEvent } from "react";
+
+function SignupForm() {
+  const router = useRouter();
+  const [form, setForm] = useState({ name: "Alex Morgan", username: "alexm", email: "demo@nexus.dev", password: "password123" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (field: keyof typeof form, value: string) => {
+    setForm((previous) => ({ ...previous, [field]: value }));
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const response = await fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    setLoading(false);
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      setError(payload.error || "Unable to create your account right now.");
+      return;
+    }
+
+    router.push("/login");
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-slate-700">Full name</label>
+          <input
+            value={form.name}
+            onChange={(event) => handleChange("name", event.target.value)}
+            className="w-full rounded-2xl border border-violet-100 bg-slate-50 px-4 py-3 outline-none transition focus:border-violet-400"
+            required
+          />
+        </div>
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-slate-700">Username</label>
+          <input
+            value={form.username}
+            onChange={(event) => handleChange("username", event.target.value)}
+            className="w-full rounded-2xl border border-violet-100 bg-slate-50 px-4 py-3 outline-none transition focus:border-violet-400"
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-slate-700">Email</label>
+        <input
+          type="email"
+          value={form.email}
+          onChange={(event) => handleChange("email", event.target.value)}
+          className="w-full rounded-2xl border border-violet-100 bg-slate-50 px-4 py-3 outline-none transition focus:border-violet-400"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-slate-700">Password</label>
+        <input
+          type="password"
+          value={form.password}
+          onChange={(event) => handleChange("password", event.target.value)}
+          className="w-full rounded-2xl border border-violet-100 bg-slate-50 px-4 py-3 outline-none transition focus:border-violet-400"
+          required
+        />
+      </div>
+
+      {error ? <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</div> : null}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-violet-400/30 transition hover:brightness-110 disabled:opacity-60"
+      >
+        {loading ? "Creating account..." : "Create account"}
+      </button>
+    </form>
+  );
+}
